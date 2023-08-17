@@ -4,7 +4,7 @@ import numpy as np
 import pysparkling
 
 import trajnetplusplustools
-from .mytrajnetplusplustools.trajnetplusplustools import writers, Reader, metrics, SceneRow
+from .jrdb_trajnetplusplustools import writers, Reader, metrics, SceneRow
 from trajnetplusplustools.kalman import predict as kalman_predict
 from trajnetplusplustools.interactions import check_interaction, group
 from trajnetplusplustools.interactions import get_interaction_type

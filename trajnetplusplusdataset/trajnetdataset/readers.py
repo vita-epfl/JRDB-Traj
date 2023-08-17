@@ -7,7 +7,7 @@ import xml.etree.ElementTree
 import numpy as np
 import scipy.interpolate
 
-from .mytrajnetplusplustools.trajnetplusplustools import TrackRow
+from .jrdb_trajnetplusplustools import TrackRow
 
 def jrdb(line):
     line = [e for e in line.split(',') if e != '']

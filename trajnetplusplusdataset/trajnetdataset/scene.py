@@ -2,7 +2,7 @@
 import os
 from collections import defaultdict
 
-from .mytrajnetplusplustools.trajnetplusplustools import SceneRow, writers
+from .jrdb_trajnetplusplustools import SceneRow, writers
 
 
 
