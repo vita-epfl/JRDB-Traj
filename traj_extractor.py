@@ -2,6 +2,7 @@ import numpy as np
 import json
 import csv
 import os
+import argparse
 
 # Function to process the JSON files and generate CSV output
 def process_files(file_names, jrdb_3d, jrdb_2d, out_path):
@@ -43,9 +44,13 @@ def process_files(file_names, jrdb_3d, jrdb_2d, out_path):
                                     break
 
 def main():
+
     # Define paths and filenames
-    out_path = 'jrdb/test/' ## CHANGE TO YOUR DATA PATH
-    jrdb_path = 'jrdb_raw/' ## CHANGE TO YOUR DATA PATH
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--jrdb_path', default='jrdb/test/',
+                        help='CHANGE TO YOUR DATA PATH')
+    parser.add_argument('--out_path', default='jrdb_raw/',
+                        help='CHANGE TO YOUR DATA PATH')
     jrdb_3d = os.path.join(jrdb_path, 'labels_3d/')
     jrdb_2d = os.path.join(jrdb_path, 'labels_2d_stitched/')
 
