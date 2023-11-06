@@ -4,11 +4,12 @@ import numpy as np
 import pysparkling
 
 import trajnetplusplustools
-from .jrdb_trajnetplusplustools import writers, Reader, metrics, SceneRow
-from trajnetplusplustools.kalman import predict as kalman_predict
-from trajnetplusplustools.interactions import check_interaction, group
-from trajnetplusplustools.interactions import get_interaction_type
 
+from .tools.writers import trajnet
+from .tools.reader import Reader
+from .tools.metrics import final_l2, collision
+from .tools.data import SceneRow
+from .tools.interactions import get_interaction_type
 import pickle
 from .orca_helper import predict_all
 
@@ -20,30 +21,12 @@ def get_type(scene, args):
     '''
 
     ## Get xy-coordinates from trackRows
-    # scene_xy = Reader.paths_to_xy(scene)
     scene_xy = trajnetplusplustools.Reader.paths_to_xy(scene)
 
     ## Type 1
     def euclidean_distance(row1, row2):
         """Euclidean distance squared between two rows."""
         return np.sqrt((row1.x - row2.x) ** 2 + (row1.y - row2.y) ** 2)
-
-    ## Type 2
-    def linear_system(scene, obs_len, pred_len):
-        '''
-        return: True if the traj is linear according to Kalman
-        '''
-        kalman_prediction, _ = kalman_predict(scene, obs_len, pred_len)[0]
-        return metrics.final_l2(scene[0], kalman_prediction)
-
-    ## Type 3
-    def interaction(rows, pos_range, dist_thresh, obs_len):
-        '''
-        :return: Determine if interaction exists and type (optionally)
-        '''
-        interaction_matrix = check_interaction(rows, pos_range=pos_range, \
-                                 dist_thresh=dist_thresh, obs_len=obs_len)
-        return np.any(interaction_matrix)
 
     ## Category Tags
     mult_tag = []
@@ -53,18 +36,6 @@ def get_type(scene, args):
     if euclidean_distance(scene[0][0], scene[0][-1]) < args.static_threshold:
         mult_tag.append(1)
 
-    # elif interaction(scene_xy, args.inter_pos_range, args.inter_dist_thresh, args.obs_len) \
-    #      or np.any(group(scene_xy, args.grp_dist_thresh, args.grp_std_thresh, args.obs_len)):
-    #     mult_tag.append(3)
-
-    # Linear
-    elif linear_system(scene, args.obs_len, args.pred_len) < args.linear_threshold:
-        mult_tag.append(2)
-
-    # Interactions
-    elif interaction(scene_xy, args.inter_pos_range, args.inter_dist_thresh, args.obs_len) \
-         or np.any(group(scene_xy, args.grp_dist_thresh, args.grp_std_thresh, args.obs_len)):
-        mult_tag.append(3)
 
     # Non-Linear (No explainable reason)
     else:
@@ -86,7 +57,7 @@ def check_collision(scene, n_predictions):
     '''
     ped_interest = scene[0]
     for ped_other in scene[1:]:
-        if metrics.collision(ped_interest, ped_other, n_predictions):
+        if collision(ped_interest, ped_other, n_predictions):
             return True
     return False
 
@@ -132,8 +103,8 @@ def all_ped_present(scene):
 def write(rows, path, new_scenes, new_frames):
     """ Writing scenes with categories """
     output_path = path.replace('output_pre', 'output')
-    pysp_tracks = rows.filter(lambda r: r.frame in new_frames).map(writers.trajnet)
-    pysp_scenes = pysparkling.Context().parallelize(new_scenes).map(writers.trajnet)
+    pysp_tracks = rows.filter(lambda r: r.frame in new_frames).map(trajnet)
+    pysp_scenes = pysparkling.Context().parallelize(new_scenes).map(trajnet)
     pysp_scenes.union(pysp_tracks).saveAsTextFile(output_path)
 
 def trajectory_type(rows, path, fps, track_id=0, args=None):
@@ -179,8 +150,8 @@ def trajectory_type(rows, path, fps, track_id=0, args=None):
     np.random.seed(0)
     
     for index, scene in enumerate(scenes):
-        if (index+1) % 50 == 0:
-            print(index)
+        # if (index+1) % 50 == 0:
+        #     print(index)
 
         ## Primary Path
         ped_interest = scene[0]

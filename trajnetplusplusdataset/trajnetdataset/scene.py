@@ -1,10 +1,10 @@
 """ Preparng Scenes for TrajNet """
 import os
 from collections import defaultdict
+import math
 
-from .jrdb_trajnetplusplustools import SceneRow, writers
-
-
+from .tools.data import SceneRow
+from .tools.writers import trajnet
 
 class Scenes(object):
     def __init__(self, fps, start_scene_id=0, args=None):
@@ -30,10 +30,16 @@ class Scenes(object):
         pedestrians. Approximate with multi-occupancy of discrete grid cells.
         """
         sparse_occupancy = defaultdict(list)
-        for row in rows:
-            x = int(row.x // cell_size * cell_size)
-            y = int(row.y // cell_size * cell_size)
-            sparse_occupancy[(x, y)].append(row.pedestrian)
+        for row in rows:       
+            if math.isnan(row.x) == False:
+                    
+                x = int(row.x // cell_size * cell_size)
+                y = int(row.y // cell_size * cell_size)
+                sparse_occupancy[(x, y)].append(row.pedestrian)
+            else:
+                sparse_occupancy[(-10,0)].append(row.pedestrian)
+  
+
         return {ped_id
                 for cell in sparse_occupancy.values() if len(cell) > 1
                 for ped_id in cell}
@@ -44,24 +50,24 @@ class Scenes(object):
         median_increment = sorted(increments)[int(len(increments) / 2)]
         ok = median_increment * tolerance > max(increments)
 
-        # if not ok:
-        #     print('!!!!!!!!! DETECTED GAP IN FRAMES')
-        #     print(increments)
-
         return ok
 
     def from_rows(self, rows):
+
         count_by_frame = rows.groupBy(lambda r: r.frame).mapValues(len).collectAsMap()
+
         occupancy_by_frame = (rows
                               .groupBy(lambda r: r.frame)
                               .mapValues(self.close_pedestrians)
                               .collectAsMap())
-
+  
         def to_scene_row(ped_frames):
             ped_id, scene_frames = ped_frames
+
             row = SceneRow(self.scene_id, ped_id, scene_frames[0], scene_frames[-1], self.fps, 0)
             self.scene_id += 1
             return row
+
 
         # scenes: pedestrian of interest, [frames]
         scenes = (
@@ -73,9 +79,9 @@ class Scenes(object):
                 [path[ii].frame for ii in range(i, i + self.chunk_size)]
                 for i in range(0, len(path) - self.chunk_size + 1, self.chunk_stride)
                 # filter for pedestrians moving by more than min_length meter
-                if self.euclidean_distance_2(path[i], path[i+self.chunk_size-1]) > self.min_length
+                # if self.euclidean_distance_2(path[i], path[i+self.chunk_size-1]) > self.min_length
             ])
-
+            
             # filter out scenes with large gaps in frame numbers
             .filter(lambda ped_frames: self.continuous_frames(ped_frames[1]))
 
@@ -92,13 +98,15 @@ class Scenes(object):
             .cache()
         )
 
+
+          
         self.frames |= set(scenes
                            .flatMap(lambda ped_frames:
                                     ped_frames[1]
                                     if self.visible_chunk is None
                                     else ped_frames[1][:self.visible_chunk])
                            .toLocalIterator())
-
+  
         return scenes.map(to_scene_row)
 
 
@@ -108,8 +116,11 @@ class Scenes(object):
             self.visible_chunk = self.obs_len
         else:
             self.visible_chunk = None
+      
         scenes = self.from_rows(rows)
+
         tracks = rows.filter(lambda r: r.frame in self.frames)
+  
         all_data = rows.context.union((scenes, tracks))
 
         ## removes the file, if previously generated
@@ -117,6 +128,6 @@ class Scenes(object):
             os.remove(output_file)
 
         ## write scenes and tracks
-        all_data.map(writers.trajnet).saveAsTextFile(output_file)
+        all_data.map(trajnet).saveAsTextFile(output_file)
 
         return self

@@ -171,8 +171,8 @@ def trajectory_type(rows, path, fps, track_id=0, args=None):
         raise Exception('No scenes found')
 
     for index, scene in enumerate(scenes):
-        if (index+1) % 50 == 0:
-            print(index)
+        # if (index+1) % 50 == 0:
+        #     print(index)
 
         ## Primary Path
         ped_interest = scene[0]

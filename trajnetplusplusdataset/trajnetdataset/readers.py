@@ -7,15 +7,14 @@ import xml.etree.ElementTree
 import numpy as np
 import scipy.interpolate
 
-from .jrdb_trajnetplusplustools import TrackRow
-
+from .tools.data import TrackRow
 def jrdb(line):
     line = [e for e in line.split(',') if e != '']
+
     return TrackRow(int(float(line[0])),
                     int(float(line[1])),
-                    float(line[2]),float(line[3]),
-                    float(line[4]),float(line[5]), float(line[6]), float(line[7]),
-                    float(line[8]),float(line[9]), float(line[10]), float(line[11]))
+                    float(line[2]),float(line[3]),float(line[4]))
+            
 
 def biwi(line):
     line = [e for e in line.split(' ') if e != '']
@@ -283,9 +282,9 @@ def get_trackrows(line):
     line = json.loads(line)
     track = line.get('track')
     if track is not None:
-        return TrackRow(track['f'], track['p'], track['x'], track['y'],
-                        track['h'], track['w'], track['l'], track['rot_z'],
-                        track['bb_left'], track['bb_top'], track['bb_width'], track['bb_height'],
+        return TrackRow(track['f'], track['p'], track['x'], track['y'], track['v'],
+                        # track['h'], track['w'], track['l'], track['rot_z'],
+                        # track['bb_left'], track['bb_top'], track['bb_width'], track['bb_height'],
                         track.get('prediction_number'))
     return None
 

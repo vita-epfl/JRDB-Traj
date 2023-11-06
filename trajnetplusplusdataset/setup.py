@@ -16,9 +16,6 @@ setup(
     ],
     license='MIT',
     description='Trajnet++ dataset.',
-    long_description=open('README.rst').read(),
-    author='Sven Kreiss',
-    author_email='me@svenkreiss.com',
     url='https://github.com/vita-epfl/trajnetplusplusdataset',
 
     install_requires=[
