@@ -1,7 +1,7 @@
 # After extracting the raw data, you will get the extracted data located at the output_path you set.
-jrdb_path="/data2/saeed-data/jrdb/train_dataset/labels/"
+jrdb_path="<your_data_path>/train_dataset/labels/"
 # You should put the "Test Trackings" results downloaded from the JRDB webpage in the following address
-jrdb_test_path="/data2/saeed-data/jrdb/test_trackings/"
+jrdb_test_path="<your_data_path>/test_trackings/"
 
 out_path="OUT_tmp"
 

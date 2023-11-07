@@ -1,6 +1,6 @@
 venv/
 trajnetplusplusdataset/Python-RVO2-main/
-trajnetplusplusdataset/data/
+trajnetplusplusdataset/data/raw/*.csv
 trajnetplusplusdataset/output_pre/
 trajnetplusplusdataset/socialforce-main/
 trajnetplusplusdataset/trajnetdataset/__pycache__
@@ -11,3 +11,6 @@ jrdb_baselines/trajnetbaselines/__pycache__/
 jrdb_baselines/trajnetbaselines/lstm/__pycache__/
 jrdb_baselines/trajnetbaselines/lstm/tools/__pycache__/
 jrdb_baselines/evaluator/__pycache__/
+jrdb_submission/
+jrdb_baselines/DATA_BLOCK/jrdb_traj/
+jrdb_baselines/OUTPUT_BLOCK/jrdb_traj/
