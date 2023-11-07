@@ -1,0 +1,13 @@
+venv/
+trajnetplusplusdataset/Python-RVO2-main/
+trajnetplusplusdataset/data/
+trajnetplusplusdataset/output_pre/
+trajnetplusplusdataset/socialforce-main/
+trajnetplusplusdataset/trajnetdataset/__pycache__
+trajnetplusplusdataset/trajnetdataset/tools/__pycache__/
+trajnetplusplusdataset/trajnetdataset.egg-info/
+jrdb_baselines/trajnetbaselines.egg-info/
+jrdb_baselines/trajnetbaselines/__pycache__/
+jrdb_baselines/trajnetbaselines/lstm/__pycache__/
+jrdb_baselines/trajnetbaselines/lstm/tools/__pycache__/
+jrdb_baselines/evaluator/__pycache__/

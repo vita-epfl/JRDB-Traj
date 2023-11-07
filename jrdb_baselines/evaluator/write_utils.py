@@ -73,7 +73,7 @@ def write_predictions(pred_list, scenes, model_name, dataset_name, dataset_index
     txt_name = path_temp
 
     trajs = np.loadtxt(txt_name, dtype=str)
-    trajs = np.array(trajs).astype(np.float)
+    trajs = np.array(trajs).astype(float)
     with open(path_pred+ str(dataset_index).zfill(4)+'.txt', 'a') as txtfile:
         for pred_id in range(12):
             for row_id in range(trajs.shape[0]):
